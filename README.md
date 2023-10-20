@@ -1,2 +1,15 @@
-# module-bun-twitch
-A Twitch module with Bun developed for Evntboard.
+# module_native_twitch
+
+To install dependencies:
+
+```bash
+bun install
+```
+
+To run:
+
+```bash
+bun run src/index.js
+```
+
+This project was created using `bun init` in bun v1.0.1. [Bun](https://bun.sh) is a fast all-in-one JavaScript runtime.

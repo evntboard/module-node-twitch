@@ -1,0 +1,25 @@
+{
+  "name": "module_native_twitch",
+  "module": "src/index.js",
+  "type": "module",
+  "scripts": {
+    "start": "bun src/index.js",
+    "build": "mkdir -p dist/ && bun build --compile ./src/index.js --outfile=dist/module_native_twitch"
+  },
+  "devDependencies": {
+    "bun-types": "latest"
+  },
+  "peerDependencies": {
+    "typescript": "^5.0.0"
+  },
+  "dependencies": {
+    "@twurple/api": "^7.0.4",
+    "@twurple/auth": "^7.0.4",
+    "@twurple/chat": "^7.0.4",
+    "@twurple/pubsub": "^7.0.4",
+    "json-rpc-2.0": "^1.6.0",
+    "twurple": "^1.0.0",
+    "uuid": "^9.0.1",
+    "yargs-parser": "^21.1.1"
+  }
+}
