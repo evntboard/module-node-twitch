@@ -1,0 +1,10 @@
+---
+image: scratch
+workdir: /app
+adds:
+- "./evntboard"
+entrypoint:
+- /app/evntboard
+ignores:
+- "**"
+- "!/evntboard"

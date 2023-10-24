@@ -1,0 +1,24 @@
+---
+builders:
+- image: oven/bun:1.0
+  workdir: /app
+  adds:
+  - "."
+  script:
+  - bun install
+  - bun build src/index.js --compile --outfile ./evntboard
+  caches:
+  - /app/node_modules/
+image: ubuntu:latest
+workdir: /app
+artifacts:
+- builder: builder-0
+  source: "/app/evntboard"
+  destination: "/app/evntboard"
+entrypoint:
+- /app/evntboard
+ignores:
+- "**"
+- "!/src/"
+- "!/package.json"
+- "!/package-lock.json"
