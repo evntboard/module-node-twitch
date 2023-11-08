@@ -1,6 +1,6 @@
 import { EventSubWsListener } from '@twurple/eventsub-ws'
 
-export function listen(twitchApiInstance, currentUser) {
+export function listen(twitchApiInstance, currentUser, serverAndClient) {
   const eventSubListener = new EventSubWsListener({ twitchApiInstance });
   eventSubListener.start();
 
