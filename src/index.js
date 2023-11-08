@@ -5,6 +5,8 @@ import { ApiClient } from '@twurple/api'
 import { ChatClient } from '@twurple/chat'
 import { PubSubClient } from '@twurple/pubsub'
 
+import * as TwitchEventPub from './twitchEventPub.js'
+
 import { MODULE_CODE, MODULE_NAME, TWITCH_SCOPES, START_ARGS } from './constant.js'
 import {
   transformChatBitsBadgeUpgradeInfo,
@@ -49,6 +51,8 @@ const connectTwitch = async (serverAndClient, twitchClientId, twitchAccessToken,
     isAlwaysMod: true,
     authProvider: authBotProvider ? authBotProvider :  authProvider
   })
+
+  TwitchEventPub.listen(twitchApiInstance)
 
   // Fires when a user redeems channel points
   twitchRedemptionListener = await twitchPubSubInstance?.onRedemption(
