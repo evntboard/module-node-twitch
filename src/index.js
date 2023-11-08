@@ -52,7 +52,7 @@ const connectTwitch = async (serverAndClient, twitchClientId, twitchAccessToken,
     authProvider: authBotProvider ? authBotProvider :  authProvider
   })
 
-  TwitchEventPub.listen(twitchApiInstance)
+  TwitchEventPub.listen(twitchApiInstance, currentUser)
 
   // Fires when a user redeems channel points
   twitchRedemptionListener = await twitchPubSubInstance?.onRedemption(
