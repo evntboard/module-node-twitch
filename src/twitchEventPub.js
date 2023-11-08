@@ -20,7 +20,7 @@ export function listen(twitchApiInstance) {
     })
   });
 
-  eventSubListener.onChannelFollow(currentUser.userId, (msg) => {
+  eventSubListener.onChannelFollow(currentUser.userId, currentUser.userId, (msg) => {
     serverAndClient.notify('event.new', {
       name: `${MODULE_CODE}-channel-follow`,
       payload: msg
@@ -209,14 +209,14 @@ export function listen(twitchApiInstance) {
     })
   })
 
-  eventSubListener.onChannelShoutoutCreate(currentUser.userId, (msg) => {
+  eventSubListener.onChannelShoutoutCreate(currentUser.userId, currentUser.userId, (msg) => {
     serverAndClient.notify('event.new', {
       name: `${MODULE_CODE}-channel-shoutout-create`,
       payload: msg
     })
   })
 
-  eventSubListener.onChannelShoutoutReceive(currentUser.userId, (msg) => {
+  eventSubListener.onChannelShoutoutReceive(currentUser.userId, currentUser.userId, (msg) => {
     serverAndClient.notify('event.new', {
       name: `${MODULE_CODE}-channel-shoutout-receive`,
       payload: msg
