@@ -2,7 +2,7 @@ import yargs from 'yargs-parser'
 
 export const MODULE_CODE = 'twitch'
 
-const rawArgs = Bun.argv.slice(1);
+const rawArgs = process.argv.slice(1);
 export const START_ARGS = yargs(rawArgs);
 
 export const MODULE_NAME = START_ARGS["name"] ?? 'twitch'
