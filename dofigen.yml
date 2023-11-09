@@ -4,6 +4,8 @@ workdir: /home/node/app
 root:
   script:
   - chown -R 1000:1000 /home/node/app
+adds:
+- "."
 script:
 - npm i
 entrypoint:
