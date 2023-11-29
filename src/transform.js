@@ -1,3 +1,5 @@
+import { EventSubChannelBanEvent } from '@twurple/eventsub-base/lib/events/EventSubChannelBanEvent'
+
 export const transformChatMessage = (message, data) => ({
   message,
   id: data?.id,
@@ -213,3 +215,187 @@ export const transformWhisper = (data) => ({
   text: data?.text,
   emoteOffsets: Object.fromEntries(data?.gifterGiftCount),
 })
+
+export const transformEventSubStreamOnlineEvent = (data) => {
+  return ({
+    id: data.id,
+    startDate: data.startDate,
+    type: data.type,
+    broadcasterId: data.broadcasterId,
+    broadcasterName: data.broadcasterName,
+    broadcasterDisplayName: data.broadcasterDisplayName,
+  })
+}
+
+export const transformEventSubStreamOfflineEvent = (data) => {
+  return ({
+    broadcasterId: data.broadcasterId,
+    broadcasterName: data.broadcasterName,
+    broadcasterDisplayName: data.broadcasterDisplayName,
+  })
+}
+
+export const transformEventSubChannelFollowEvent = (data) => {
+  return ({
+    userId: data.userId,
+    userName: data.userName,
+    userDisplayName: data.userDisplayName,
+    broadcasterId: data.broadcasterId,
+    broadcasterName: data.broadcasterName,
+    broadcasterDisplayName: data.broadcasterDisplayName,
+    followDate: data.followDate?.toISOString(),
+  })
+}
+
+export const transformEventSubChannelSubscriptionEvent = (data) => {
+  return ({
+    userId: data.userId,
+    userName: data.userName,
+    userDisplayName: data.userDisplayName,
+    broadcasterId: data.broadcasterId,
+    broadcasterName: data.broadcasterName,
+    broadcasterDisplayName: data.broadcasterDisplayName,
+    tier: data.tier,
+    isGift: data.isGift,
+  })
+}
+
+export const transformEventSubChannelSubscriptionGiftEvent = (data) => {
+  return ({
+    gifterId: data.gifterId,
+    gifterName: data.gifterName,
+    gifterDisplayName: data.gifterDisplayName,
+    broadcasterId: data.broadcasterId,
+    broadcasterName: data.broadcasterName,
+    broadcasterDisplayName: data.broadcasterDisplayName,
+    amount: data.amount,
+    cumulativeAmount: data.cumulativeAmount,
+    tier: data.tier,
+    isAnonymous: data.isAnonymous,
+  })
+}
+
+export const transformEventSubChannelSubscriptionMessageEvent = (data) => {
+  return ({
+    userId: data.userId,
+    userName: data.userName,
+    userDisplayName: data.userDisplayName,
+    broadcasterId: data.broadcasterId,
+    broadcasterName: data.broadcasterName,
+    broadcasterDisplayName: data.broadcasterDisplayName,
+    tier: data.tier,
+    cumulativeMonths: data.cumulativeMonths,
+    streakMonths: data.streakMonths,
+    durationMonths: data.durationMonths,
+    messageText: data.messageText,
+    emoteOffsets: data.emoteOffsets,
+  })
+}
+
+export const transformEventSubChannelSubscriptionEndEvent = (data) => {
+  return ({
+    userId: data.userId,
+    userName: data.userName,
+    userDisplayName: data.userDisplayName,
+    broadcasterId: data.broadcasterId,
+    broadcasterName: data.broadcasterName,
+    broadcasterDisplayName: data.broadcasterDisplayName,
+    tier: data.tier,
+    isGift: data.isGift,
+  })
+}
+
+export const transformEventSubChannelCheerEvent = (data) => {
+  return ({
+    userId: data.userId,
+    userName: data.userName,
+    userDisplayName: data.userDisplayName,
+    broadcasterId: data.broadcasterId,
+    broadcasterName: data.broadcasterName,
+    broadcasterDisplayName: data.broadcasterDisplayName,
+    isAnonymous: data.isAnonymous,
+    message: data.message,
+    bits: data.bits,
+  })
+}
+
+export const transformEventSubChannelHypeTrainBeginEvent = (data) => {
+  return ({
+    id: data.id,
+    broadcasterId: data.broadcasterId,
+    broadcasterName: data.broadcasterName,
+    broadcasterDisplayName: data.broadcasterDisplayName,
+    level: data.level,
+    total: data.total,
+    progress: data.progress,
+    goal: data.goal,
+    topContributors: data.topContributors,
+    lastContribution: data.lastContribution,
+    startDate: data.startDate?.toISOString(),
+    expiryDate: data.expiryDate?.toISOString(),
+  })
+}
+
+export const transformEventSubChannelHypeTrainProgressEvent = (data) => {
+  return ({
+    id: data.id,
+    broadcasterId: data.broadcasterId,
+    broadcasterName: data.broadcasterName,
+    broadcasterDisplayName: data.broadcasterDisplayName,
+    level: data.level,
+    total: data.total,
+    progress: data.progress,
+    goal: data.goal,
+    topContributors: data.topContributors,
+    lastContribution: data.lastContribution,
+    startDate: data.startDate?.toISOString(),
+    expiryDate: data.expiryDate?.toISOString(),
+  })
+}
+
+export const transformEventSubChannelHypeTrainEndEvent = (data) => {
+  return ({
+    id: data.id,
+    broadcasterId: data.broadcasterId,
+    broadcasterName: data.broadcasterName,
+    broadcasterDisplayName: data.broadcasterDisplayName,
+    level: data.level,
+    total: data.total,
+    topContributors: data.topContributors,
+    startDate: data.startDate?.toISOString(),
+    endDate: data.endDate?.toISOString(),
+    cooldownEndDate: data.cooldownEndDate?.toISOString(),
+  })
+}
+
+export const transformEventSubChannelBanEvent = (data) => {
+  return ({
+    userId: data.userId,
+    userName: data.userName,
+    userDisplayName: data.userDisplayName,
+    broadcasterId: data.broadcasterId,
+    broadcasterName: data.broadcasterName,
+    broadcasterDisplayName: data.broadcasterDisplayName,
+    moderatorId: data.moderatorId,
+    moderatorName: data.moderatorName,
+    moderatorDisplayName: data.moderatorDisplayName,
+    reason: data.reason,
+    startDate: data.startDate?.toISOString(),
+    endDate: data.endDate?.toISOString(),
+    isPermanent: data.isPermanent,
+  })
+}
+
+export const transformEventSubChannelUnbanEvent = (data) => {
+  return ({
+    userId: data.userId,
+    userName: data.userName,
+    userDisplayName: data.userDisplayName,
+    broadcasterId: data.broadcasterId,
+    broadcasterName: data.broadcasterName,
+    broadcasterDisplayName: data.broadcasterDisplayName,
+    moderatorId: data.moderatorId,
+    moderatorName: data.moderatorName,
+    moderatorDisplayName: data.moderatorDisplayName,
+  })
+}

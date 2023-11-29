@@ -1,101 +1,116 @@
 import { EventSubWsListener } from '@twurple/eventsub-ws'
-import { MODULE_CODE } from '../constant.js'
 
-export async function twitchEventSubListen(twitchApiInstance, currentUser, serverAndClient) {
-  const eventSubListener = new EventSubWsListener({ apiClient: twitchApiInstance });
-  
-  eventSubListener.start();
+import { MODULE_CODE } from '../constant.js'
+import {
+  transformEventSubChannelBanEvent,
+  transformEventSubChannelCheerEvent,
+  transformEventSubChannelFollowEvent,
+  transformEventSubChannelHypeTrainBeginEvent,
+  transformEventSubChannelHypeTrainEndEvent,
+  transformEventSubChannelHypeTrainProgressEvent,
+  transformEventSubChannelSubscriptionEndEvent,
+  transformEventSubChannelSubscriptionEvent,
+  transformEventSubChannelSubscriptionGiftEvent,
+  transformEventSubChannelSubscriptionMessageEvent, transformEventSubChannelUnbanEvent,
+  transformEventSubStreamOfflineEvent,
+  transformEventSubStreamOnlineEvent
+} from '../transform.js'
+
+export async function twitchEventSubListen (twitchApiInstance, currentUser, serverAndClient) {
+  const eventSubListener = new EventSubWsListener({ apiClient: twitchApiInstance })
+
+  eventSubListener.start()
 
   // Fires when broadcast start
   eventSubListener.onStreamOnline(currentUser.userId, (msg) => {
     serverAndClient.notify('event.new', {
       name: `${MODULE_CODE}-stream-online`,
-      payload: msg
+      payload: transformEventSubStreamOnlineEvent(msg)
     })
-  });
+  })
 
-    // Fires when broadcast stop
+  // Fires when broadcast stop
   eventSubListener.onStreamOffline(currentUser.userId, (msg) => {
     serverAndClient.notify('event.new', {
       name: `${MODULE_CODE}-stream-offline`,
-      payload: msg
+      payload: transformEventSubStreamOfflineEvent(msg)
     })
-  });
+  })
 
   eventSubListener.onChannelFollow(currentUser.userId, currentUser.userId, (msg) => {
     serverAndClient.notify('event.new', {
       name: `${MODULE_CODE}-channel-follow`,
-      payload: msg
+      payload: transformEventSubChannelFollowEvent(msg)
     })
   })
 
   eventSubListener.onChannelSubscription(currentUser.userId, (msg) => {
     serverAndClient.notify('event.new', {
       name: `${MODULE_CODE}-channel-subscription`,
-      payload: msg
+      payload: transformEventSubChannelSubscriptionEvent(msg)
     })
   })
 
   eventSubListener.onChannelSubscriptionGift(currentUser.userId, (msg) => {
     serverAndClient.notify('event.new', {
       name: `${MODULE_CODE}-channel-subscription-gift`,
-      payload: msg
+      payload: transformEventSubChannelSubscriptionGiftEvent(msg)
     })
   })
 
   eventSubListener.onChannelSubscriptionMessage(currentUser.userId, (msg) => {
     serverAndClient.notify('event.new', {
       name: `${MODULE_CODE}-channel-subscription-message`,
-      payload: msg
+      payload: transformEventSubChannelSubscriptionMessageEvent(msg)
     })
   })
 
   eventSubListener.onChannelSubscriptionEnd(currentUser.userId, (msg) => {
     serverAndClient.notify('event.new', {
       name: `${MODULE_CODE}-channel-subscription-end`,
-      payload: msg
+      payload: transformEventSubChannelSubscriptionEndEvent(msg)
     })
   })
 
   eventSubListener.onChannelCheer(currentUser.userId, (msg) => {
     serverAndClient.notify('event.new', {
       name: `${MODULE_CODE}-channel-cheer`,
-      payload: msg
+      payload: transformEventSubChannelCheerEvent(msg)
     })
   })
 
   eventSubListener.onChannelHypeTrainBegin(currentUser.userId, (msg) => {
     serverAndClient.notify('event.new', {
       name: `${MODULE_CODE}-channel-hype-train-begin`,
-      payload: msg
+      payload: transformEventSubChannelHypeTrainBeginEvent(msg)
     })
   })
 
   eventSubListener.onChannelHypeTrainProgress(currentUser.userId, (msg) => {
     serverAndClient.notify('event.new', {
       name: `${MODULE_CODE}-channel-hype-train-progress`,
-      payload: msg
+      payload: transformEventSubChannelHypeTrainProgressEvent(msg)
     })
   })
 
   eventSubListener.onChannelHypeTrainEnd(currentUser.userId, (msg) => {
     serverAndClient.notify('event.new', {
       name: `${MODULE_CODE}-channel-hype-train-end`,
-      payload: msg
+      payload: transformEventSubChannelHypeTrainEndEvent(msg)
     })
   })
 
   eventSubListener.onChannelBan(currentUser.userId, (msg) => {
     serverAndClient.notify('event.new', {
       name: `${MODULE_CODE}-channel-ban`,
-      payload: msg
+      payload: transformEventSubChannelBanEvent(msg)
     })
   })
 
   eventSubListener.onChannelUnban(currentUser.userId, (msg) => {
     serverAndClient.notify('event.new', {
       name: `${MODULE_CODE}-channel-unban`,
-      payload: msg
+      payload: transformEventSubChannelUnbanEvent(msg)
     })
   })
 
