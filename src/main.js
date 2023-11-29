@@ -6,11 +6,9 @@ import { WebSocket } from 'ws'
 import { StaticAuthProvider } from '@twurple/auth'
 import { ApiClient } from '@twurple/api'
 import { ChatClient } from '@twurple/chat'
-import { PubSubClient } from '@twurple/pubsub'
 
 import { twitchChatListen, twitchChatRegister } from './twitch/twitchChat.js'
 import { twitchEventSubListen } from './twitch/twitchEventSub.js'
-import { twitchPubSubListen } from './twitch/twitchPubSub.js'
 import { twitchApiRegister } from './twitch/twitchApi'
 
 import { EVNTBOARD_HOST, MODULE_CODE, MODULE_NAME, MODULE_TOKEN, TWITCH_SCOPES } from './constant.js'
@@ -92,8 +90,6 @@ const main = async () => {
 
     const twitchApiInstance = new ApiClient({ authProvider })
 
-    const twitchPubSubInstance = new PubSubClient({ authProvider })
-
     const currentUser = await twitchApiInstance.getTokenInfo()
 
     const twitchChatInstance = new ChatClient({
@@ -103,8 +99,6 @@ const main = async () => {
     })
 
     await twitchChatListen(twitchChatInstance, currentUser, serverAndClient)
-
-    await twitchPubSubListen(twitchPubSubInstance, currentUser, serverAndClient)
 
     await twitchEventSubListen(twitchApiInstance, currentUser, serverAndClient)
 

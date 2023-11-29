@@ -22,11 +22,9 @@
     "@twurple/auth": "^7.0.4",
     "@twurple/chat": "^7.0.4",
     "@twurple/eventsub-ws": "^7.0.5",
-    "@twurple/pubsub": "^7.0.4",
     "dotenv": "^16.3.1",
     "json-rpc-2.0": "^1.6.0",
     "prompts": "^2.4.2",
-    "twurple": "^1.0.0",
     "uuid": "^9.0.1"
   },
   "devDependencies": {
