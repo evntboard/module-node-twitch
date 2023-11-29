@@ -1,8 +1,9 @@
 import { EventSubWsListener } from '@twurple/eventsub-ws'
-import { MODULE_CODE } from './constant.js'
+import { MODULE_CODE } from '../constant.js'
 
-export function listen(twitchApiInstance, currentUser, serverAndClient) {
+export async function twitchEventSubListen(twitchApiInstance, currentUser, serverAndClient) {
   const eventSubListener = new EventSubWsListener({ apiClient: twitchApiInstance });
+  
   eventSubListener.start();
 
   // Fires when broadcast start
