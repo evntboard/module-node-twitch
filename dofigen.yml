@@ -1,22 +1,16 @@
 ---
-builders:
-- image: oven/bun:1.0
-  workdir: /app
-  adds:
-  - "."
+image: node:20-alpine
+workdir: /home/node/app
+root:
   script:
-  - bun install
-  - bun build src/index.js --compile --outfile ./evntboard
-  caches:
-  - /app/node_modules/
-image: ubuntu:latest
-workdir: /app
-artifacts:
-- builder: builder-0
-  source: "/app/evntboard"
-  destination: "/app/evntboard"
+  - chown -R 1000:1000 /home/node/app
+adds:
+- "."
+script:
+- npm i
 entrypoint:
-- /app/evntboard
+- npm
+- start
 ignores:
 - "**"
 - "!/src/"
