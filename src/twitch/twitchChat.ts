@@ -1,4 +1,8 @@
-import { MODULE_CODE } from '../constant'
+import {JSONRPCServerAndClient} from "json-rpc-2.0";
+import {TokenInfo} from "@twurple/auth";
+import {ChatClient} from "@twurple/chat";
+
+import {MODULE_CODE} from '../constant'
 import {
   transformChatBitsBadgeUpgradeInfo,
   transformChatCommunityPayForwardInfo,
@@ -19,7 +23,7 @@ import {
   transformWhisper
 } from '../transform'
 
-export async function twitchChatListen (twitchChatInstance, currentUser, serverAndClient) {
+export async function twitchChatListen(twitchChatInstance: ChatClient, currentUser: TokenInfo, serverAndClient: JSONRPCServerAndClient) {
   twitchChatInstance.onConnect(() => {
     serverAndClient.notify('event.new', {
       name: `${MODULE_CODE}-connected`
@@ -99,7 +103,7 @@ export async function twitchChatListen (twitchChatInstance, currentUser, serverA
   twitchChatInstance?.onEmoteOnly((channel, enabled) => {
     serverAndClient.notify('event.new', {
       name: `${MODULE_CODE}-emote-only`,
-      payload: { enabled },
+      payload: {enabled},
 
     })
   })
@@ -108,7 +112,7 @@ export async function twitchChatListen (twitchChatInstance, currentUser, serverA
   twitchChatInstance?.onFollowersOnly((channel, enabled, delay) => {
     serverAndClient.notify('event.new', {
       name: `${MODULE_CODE}-follower-only`,
-      payload: { enabled, delay },
+      payload: {enabled, delay},
 
     })
   })
@@ -129,7 +133,7 @@ export async function twitchChatListen (twitchChatInstance, currentUser, serverA
   twitchChatInstance?.onJoin((channel, user) => {
     serverAndClient.notify('event.new', {
       name: `${MODULE_CODE}-join`,
-      payload: { user },
+      payload: {user},
 
     })
   })
@@ -138,7 +142,7 @@ export async function twitchChatListen (twitchChatInstance, currentUser, serverA
   twitchChatInstance?.onPart((channel, user) => {
     serverAndClient.notify('event.new', {
       name: `${MODULE_CODE}-part`,
-      payload: { user },
+      payload: {user},
 
     })
   })
@@ -229,7 +233,7 @@ export async function twitchChatListen (twitchChatInstance, currentUser, serverA
   twitchChatInstance?.onSlow((channel, enabled, delay) => {
     serverAndClient.notify('event.new', {
       name: `${MODULE_CODE}-slow`,
-      payload: { enabled, delay },
+      payload: {enabled, delay},
 
     })
   })
@@ -286,7 +290,7 @@ export async function twitchChatListen (twitchChatInstance, currentUser, serverA
   twitchChatInstance?.onSubsOnly((channel, enabled) => {
     serverAndClient.notify('event.new', {
       name: `${MODULE_CODE}-sub-only`,
-      payload: { enabled },
+      payload: {enabled},
 
     })
   })
@@ -295,7 +299,7 @@ export async function twitchChatListen (twitchChatInstance, currentUser, serverA
   twitchChatInstance?.onTimeout((channel, user, duration) => {
     serverAndClient.notify('event.new', {
       name: `${MODULE_CODE}-timeout`,
-      payload: { user, duration },
+      payload: {user, duration},
 
     })
   })
@@ -304,27 +308,16 @@ export async function twitchChatListen (twitchChatInstance, currentUser, serverA
   twitchChatInstance?.onWhisper((user, message, msg) => {
     serverAndClient.notify('event.new', {
       name: `${MODULE_CODE}-whipser`,
-      payload: { user, message, msg: transformWhisper(msg) }
+      payload: {user, message, msg: transformWhisper(msg)}
     })
   })
 }
 
-export async function twitchChatRegister (twitchChatInstance, currentUser, serverAndClient) {
-  serverAndClient.addMethod('say', ({
-    message,
-    reply
-  }) => twitchChatInstance?.say(currentUser.userName, message, { replyTo: reply }))
-  serverAndClient.addMethod('me', ({ message }) => twitchChatInstance?.action(currentUser.userName, message))
-  serverAndClient.addMethod('addVip', ({ user }) => twitchChatInstance?.addVip(currentUser.userName, user))
-  serverAndClient.addMethod('clear', () => twitchChatInstance?.clear(currentUser.userName))
-  serverAndClient.addMethod('getVips', () => twitchChatInstance?.getVips(currentUser.userName))
-  serverAndClient.addMethod('host', ({ channel }) => twitchChatInstance?.host(currentUser.userName, channel))
-  serverAndClient.addMethod('mod', ({ user }) => twitchChatInstance?.mod(currentUser.userName, user))
-  serverAndClient.addMethod('removeVip', ({ user }) => twitchChatInstance?.removeVip(currentUser.userName, user))
-  serverAndClient.addMethod('timeout', ({
-    user,
-    duration,
-    reason
-  }) => twitchChatInstance?.timeout(currentUser.userName, user, duration, reason))
+export async function twitchChatRegister(twitchChatInstance: ChatClient, currentUser: TokenInfo, serverAndClient: JSONRPCServerAndClient) {
+  if (!currentUser?.userName) {
+    throw new Error('Token have no userName set !')
+  }
 
+  serverAndClient.addMethod('say', ({message, reply}) => twitchChatInstance?.say(currentUser.userName as string, message, {replyTo: reply}))
+  serverAndClient.addMethod('me', ({message}) => twitchChatInstance?.action(currentUser.userName as string, message))
 }

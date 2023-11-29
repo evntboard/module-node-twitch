@@ -1,20 +1,21 @@
 import 'dotenv/config'
-import prompts from 'prompts'
-import { JSONRPCClient, JSONRPCServer, JSONRPCServerAndClient } from 'json-rpc-2.0'
-import { v4 as uuid } from 'uuid'
-import { WebSocket } from 'ws'
-import { StaticAuthProvider } from '@twurple/auth'
-import { ApiClient } from '@twurple/api'
-import { ChatClient } from '@twurple/chat'
+import * as prompts from 'prompts'
+import {JSONRPCClient, JSONRPCServer, JSONRPCServerAndClient} from 'json-rpc-2.0'
+import {v4 as uuid} from 'uuid'
+import {WebSocket} from 'ws'
+import {StaticAuthProvider} from '@twurple/auth'
+import {ApiClient} from '@twurple/api'
+import {ChatClient} from '@twurple/chat'
 
-import { twitchChatListen, twitchChatRegister } from './twitch/twitchChat.js'
-import { twitchEventSubListen } from './twitch/twitchEventSub.js'
-import { twitchApiRegister } from './twitch/twitchApi'
+import {twitchChatListen, twitchChatRegister} from './twitch/twitchChat'
+import {twitchEventSubListen} from './twitch/twitchEventSub'
+import {twitchApiRegister} from './twitch/twitchApi'
 
-import { EVNTBOARD_HOST, MODULE_CODE, MODULE_NAME, MODULE_TOKEN, TWITCH_SCOPES } from './constant.js'
+import {EVNTBOARD_HOST, MODULE_CODE, MODULE_NAME, MODULE_TOKEN, TWITCH_SCOPES} from './constant'
+import {EventSubWsListener} from "@twurple/eventsub-ws";
 
 const main = async () => {
-  const questions = []
+  const questions: prompts.PromptObject[] = []
 
   if (!EVNTBOARD_HOST) {
     questions.push({
@@ -40,7 +41,7 @@ const main = async () => {
     })
   }
 
-  let { token, name, host } = await prompts(questions)
+  let {token, name, host} = await prompts(questions)
 
   const config = {
     host: host ?? EVNTBOARD_HOST,
@@ -48,7 +49,7 @@ const main = async () => {
     token: token ?? MODULE_TOKEN,
   }
 
-  let ws
+  let ws: WebSocket
 
   const serverAndClient = new JSONRPCServerAndClient(
     new JSONRPCServer(),
@@ -71,10 +72,19 @@ const main = async () => {
       token: config.token
     })
 
-    let twitchClientId = result?.find((c) => c.key === 'clientId')?.value ?? undefined
-    let twitchAccessToken = result?.find((c) => c.key === 'accessToken')?.value ?? undefined
-    let twitchBotClientId = result?.find((c) => c.key === 'botClientId')?.value ?? undefined
-    let twitchBotAccessToken = result?.find((c) => c.key === 'botAccessToken')?.value ?? undefined
+    let twitchClientId = result?.find((c: { key: string, value: string }) => c.key === 'clientId')?.value ?? undefined
+    let twitchAccessToken = result?.find((c: {
+      key: string,
+      value: string
+    }) => c.key === 'accessToken')?.value ?? undefined
+    let twitchBotClientId = result?.find((c: {
+      key: string,
+      value: string
+    }) => c.key === 'botClientId')?.value ?? undefined
+    let twitchBotAccessToken = result?.find((c: {
+      key: string,
+      value: string
+    }) => c.key === 'botAccessToken')?.value ?? undefined
 
     if (!twitchClientId || !twitchAccessToken) {
       console.error(`Twitch client ID and Access Token is missing :(`)
@@ -88,9 +98,13 @@ const main = async () => {
       authBotProvider = new StaticAuthProvider(twitchBotClientId, twitchBotAccessToken, TWITCH_SCOPES)
     }
 
-    const twitchApiInstance = new ApiClient({ authProvider })
+    const twitchApiInstance = new ApiClient({authProvider})
 
     const currentUser = await twitchApiInstance.getTokenInfo()
+
+    if (!currentUser?.userName) {
+      throw new Error('Token have no userName set !')
+    }
 
     const twitchChatInstance = new ChatClient({
       channels: [currentUser.userName],
@@ -98,9 +112,13 @@ const main = async () => {
       authProvider: authBotProvider ? authBotProvider : authProvider
     })
 
+    const twitchEventSubInstance = new EventSubWsListener({apiClient: twitchApiInstance})
+
+    twitchEventSubInstance.start()
+
     await twitchChatListen(twitchChatInstance, currentUser, serverAndClient)
 
-    await twitchEventSubListen(twitchApiInstance, currentUser, serverAndClient)
+    await twitchEventSubListen(twitchEventSubInstance, currentUser, serverAndClient)
 
     await twitchChatRegister(twitchChatInstance, currentUser, serverAndClient)
 
