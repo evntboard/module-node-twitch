@@ -8,10 +8,15 @@ import {
   transformEventSubChannelHypeTrainBeginEvent,
   transformEventSubChannelHypeTrainEndEvent,
   transformEventSubChannelHypeTrainProgressEvent,
+  transformEventSubChannelModeratorEvent,
+  transformEventSubChannelPollBeginEvent,
+  transformEventSubChannelPollEndEvent,
+  transformEventSubChannelPollProgressEvent,
   transformEventSubChannelSubscriptionEndEvent,
   transformEventSubChannelSubscriptionEvent,
   transformEventSubChannelSubscriptionGiftEvent,
-  transformEventSubChannelSubscriptionMessageEvent, transformEventSubChannelUnbanEvent,
+  transformEventSubChannelSubscriptionMessageEvent,
+  transformEventSubChannelUnbanEvent,
   transformEventSubStreamOfflineEvent,
   transformEventSubStreamOnlineEvent
 } from '../transform.js'
@@ -117,35 +122,35 @@ export async function twitchEventSubListen (twitchApiInstance, currentUser, serv
   eventSubListener.onChannelModeratorAdd(currentUser.userId, (msg) => {
     serverAndClient.notify('event.new', {
       name: `${MODULE_CODE}-channel-moderator-add`,
-      payload: msg
+      payload: transformEventSubChannelModeratorEvent(msg)
     })
   })
 
   eventSubListener.onChannelModeratorRemove(currentUser.userId, (msg) => {
     serverAndClient.notify('event.new', {
       name: `${MODULE_CODE}-channel-moderator-remove`,
-      payload: msg
+      payload: transformEventSubChannelModeratorEvent(msg)
     })
   })
 
   eventSubListener.onChannelPollBegin(currentUser.userId, (msg) => {
     serverAndClient.notify('event.new', {
       name: `${MODULE_CODE}-channel-poll-begin`,
-      payload: msg
+      payload: transformEventSubChannelPollBeginEvent(msg)
     })
   })
 
   eventSubListener.onChannelPollProgress(currentUser.userId, (msg) => {
     serverAndClient.notify('event.new', {
       name: `${MODULE_CODE}-channel-poll-progress`,
-      payload: msg
+      payload: transformEventSubChannelPollProgressEvent(msg)
     })
   })
 
   eventSubListener.onChannelPollEnd(currentUser.userId, (msg) => {
     serverAndClient.notify('event.new', {
       name: `${MODULE_CODE}-channel-poll-end`,
-      payload: msg
+      payload: transformEventSubChannelPollEndEvent(msg)
     })
   })
 

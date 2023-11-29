@@ -1,5 +1,3 @@
-import { EventSubChannelBanEvent } from '@twurple/eventsub-base/lib/events/EventSubChannelBanEvent'
-
 export const transformChatMessage = (message, data) => ({
   message,
   id: data?.id,
@@ -397,5 +395,68 @@ export const transformEventSubChannelUnbanEvent = (data) => {
     moderatorId: data.moderatorId,
     moderatorName: data.moderatorName,
     moderatorDisplayName: data.moderatorDisplayName,
+  })
+}
+
+export const transformEventSubChannelModeratorEvent = (data) => {
+  return ({
+    userId: data.userId,
+    userName: data.userName,
+    userDisplayName: data.userDisplayName,
+    broadcasterId: data.broadcasterId,
+    broadcasterName: data.broadcasterName,
+    broadcasterDisplayName: data.broadcasterDisplayName,
+  })
+}
+
+export const transformEventSubChannelPollBeginEvent = (data) => {
+  return ({
+    id: data.id,
+    broadcasterId: data.broadcasterId,
+    broadcasterName: data.broadcasterName,
+    broadcasterDisplayName: data.broadcasterDisplayName,
+    title: data.title,
+    choices: data.choices,
+    isBitsVotingEnabled: data.isBitsVotingEnabled,
+    bitsPerVote: data.bitsPerVote,
+    isChannelPointsVotingEnabled: data.isChannelPointsVotingEnabled,
+    channelPointsPerVote: data.channelPointsPerVote,
+    startDate: data.startDate?.toISOString(),
+    endDate: data.endDate?.toISOString(),
+  })
+}
+
+export const transformEventSubChannelPollProgressEvent = (data) => {
+  return ({
+    id: data.id,
+    broadcasterId: data.broadcasterId,
+    broadcasterName: data.broadcasterName,
+    broadcasterDisplayName: data.broadcasterDisplayName,
+    title: data.title,
+    choices: data.choices,
+    isBitsVotingEnabled: data.isBitsVotingEnabled,
+    bitsPerVote: data.bitsPerVote,
+    isChannelPointsVotingEnabled: data.isChannelPointsVotingEnabled,
+    channelPointsPerVote: data.channelPointsPerVote,
+    startDate: data.startDate?.toISOString(),
+    endDate: data.endDate?.toISOString(),
+  })
+}
+
+export const transformEventSubChannelPollEndEvent = (data) => {
+  return ({
+    id: data.id,
+    broadcasterId: data.broadcasterId,
+    broadcasterName: data.broadcasterName,
+    broadcasterDisplayName: data.broadcasterDisplayName,
+    title: data.title,
+    choices: data.choices,
+    isBitsVotingEnabled: data.isBitsVotingEnabled,
+    bitsPerVote: data.bitsPerVote,
+    isChannelPointsVotingEnabled: data.isChannelPointsVotingEnabled,
+    channelPointsPerVote: data.channelPointsPerVote,
+    status: data.status,
+    startDate: data.startDate?.toISOString(),
+    endDate: data.endDate?.toISOString(),
   })
 }
