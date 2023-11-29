@@ -6,13 +6,13 @@ import {WebSocket} from 'ws'
 import {StaticAuthProvider} from '@twurple/auth'
 import {ApiClient} from '@twurple/api'
 import {ChatClient} from '@twurple/chat'
+import {EventSubWsListener} from "@twurple/eventsub-ws"
 
 import {twitchChatListen, twitchChatRegister} from './twitch/twitchChat'
 import {twitchEventSubListen} from './twitch/twitchEventSub'
 import {twitchApiRegister} from './twitch/twitchApi'
 
 import {EVNTBOARD_HOST, MODULE_CODE, MODULE_NAME, MODULE_TOKEN, TWITCH_SCOPES} from './constant'
-import {EventSubWsListener} from "@twurple/eventsub-ws";
 
 const main = async () => {
   const questions: prompts.PromptObject[] = []
@@ -41,7 +41,8 @@ const main = async () => {
     })
   }
 
-  let {token, name, host} = await prompts(questions)
+  // @ts-ignore
+  let {token, name, host} = await prompts.default(questions)
 
   const config = {
     host: host ?? EVNTBOARD_HOST,
