@@ -1,5 +1,8 @@
+import 'dotenv/config'
+import prompts from 'prompts'
 import { JSONRPCClient, JSONRPCServer, JSONRPCServerAndClient } from 'json-rpc-2.0'
 import { v4 as uuid } from 'uuid'
+import { WebSocket } from 'ws'
 import { StaticAuthProvider } from '@twurple/auth'
 import { ApiClient } from '@twurple/api'
 import { ChatClient } from '@twurple/chat'
@@ -7,7 +10,7 @@ import { PubSubClient } from '@twurple/pubsub'
 
 import * as TwitchEventPub from './twitchEventPub.js'
 
-import { MODULE_CODE, MODULE_NAME, TWITCH_SCOPES, START_ARGS } from './constant.js'
+import { MODULE_CODE, EVNTBOARD_HOST, MODULE_NAME, MODULE_TOKEN, TWITCH_SCOPES } from './constant.js'
 import {
   transformChatBitsBadgeUpgradeInfo,
   transformChatCommunityPayForwardInfo,
@@ -17,14 +20,17 @@ import {
   transformChatRaidInfo,
   transformChatRewardGiftInfo,
   transformChatRitualInfo,
-  transformChatStandardPayForwardInfo, transformChatSubExtendInfo, transformChatSubGiftInfo,
+  transformChatStandardPayForwardInfo,
+  transformChatSubExtendInfo,
+  transformChatSubGiftInfo,
   transformChatSubGiftUpgradeInfo,
   transformChatSubInfo,
   transformChatSubUpgradeInfo,
   transformClearChat,
   transformPubSubBitsMessage,
   transformPubSubRedemptionMessage,
-  transformUserNotice, transformWhisper
+  transformUserNotice,
+  transformWhisper
 } from './transform.js'
 
 const connectTwitch = async (serverAndClient, twitchClientId, twitchAccessToken, twitchBotClientId, twitchBotAccessToken) => {
@@ -49,7 +55,7 @@ const connectTwitch = async (serverAndClient, twitchClientId, twitchAccessToken,
   twitchChatInstance = new ChatClient({
     channels: [currentUser.userName],
     isAlwaysMod: true,
-    authProvider: authBotProvider ? authBotProvider :  authProvider
+    authProvider: authBotProvider ? authBotProvider : authProvider
   })
 
   TwitchEventPub.listen(twitchApiInstance, currentUser, serverAndClient)
@@ -363,24 +369,31 @@ const connectTwitch = async (serverAndClient, twitchClientId, twitchAccessToken,
     })
   })
 
-  serverAndClient.addMethod('say', ({message, reply}) => twitchChatInstance?.say(currentUser.userName, message, { replyTo: reply }))
-  serverAndClient.addMethod('me', ({message}) => twitchChatInstance?.action(currentUser.userName, message))
-  serverAndClient.addMethod('addVip', ({user}) => twitchChatInstance?.addVip(currentUser.userName, user))
+  serverAndClient.addMethod('say', ({
+    message,
+    reply
+  }) => twitchChatInstance?.say(currentUser.userName, message, { replyTo: reply }))
+  serverAndClient.addMethod('me', ({ message }) => twitchChatInstance?.action(currentUser.userName, message))
+  serverAndClient.addMethod('addVip', ({ user }) => twitchChatInstance?.addVip(currentUser.userName, user))
   serverAndClient.addMethod('clear', () => twitchChatInstance?.clear(currentUser.userName))
   serverAndClient.addMethod('getVips', () => twitchChatInstance?.getVips(currentUser.userName))
-  serverAndClient.addMethod('host', ({channel}) => twitchChatInstance?.host(currentUser.userName, channel))
-  serverAndClient.addMethod('mod', ({user}) => twitchChatInstance?.mod(currentUser.userName, user))
-  serverAndClient.addMethod('removeVip', ({user}) => twitchChatInstance?.removeVip(currentUser.userName, user))
-  serverAndClient.addMethod('timeout', ({user, duration, reason}) => twitchChatInstance?.timeout(currentUser.userName, user, duration, reason))
+  serverAndClient.addMethod('host', ({ channel }) => twitchChatInstance?.host(currentUser.userName, channel))
+  serverAndClient.addMethod('mod', ({ user }) => twitchChatInstance?.mod(currentUser.userName, user))
+  serverAndClient.addMethod('removeVip', ({ user }) => twitchChatInstance?.removeVip(currentUser.userName, user))
+  serverAndClient.addMethod('timeout', ({
+    user,
+    duration,
+    reason
+  }) => twitchChatInstance?.timeout(currentUser.userName, user, duration, reason))
 
   // Bits
   serverAndClient.addMethod('bitsGetLeaderboard', (data) => twitchApiInstance?.bits.getLeaderboard(data))
-  serverAndClient.addMethod('bitsGetCheermotes', ({channel}) => twitchApiInstance?.bits.getCheermotes(channel))
+  serverAndClient.addMethod('bitsGetCheermotes', ({ channel }) => twitchApiInstance?.bits.getCheermotes(channel))
 
   // Channel
   serverAndClient.addMethod('channelGetChannelEditors', () => twitchApiInstance?.channels.getChannelEditors(currentUser.userId))
-  serverAndClient.addMethod('channelUpdateTitle', ({title}) => twitchApiInstance?.channels.updateChannelInfo(currentUser.userId, { title }))
-  serverAndClient.addMethod('channelUpdateGame', async ({game}) => {
+  serverAndClient.addMethod('channelUpdateTitle', ({ title }) => twitchApiInstance?.channels.updateChannelInfo(currentUser.userId, { title }))
+  serverAndClient.addMethod('channelUpdateGame', async ({ game }) => {
     const gameObj = await twitchApiInstance.games.getGameByName(game)
     return await twitchApiInstance.channels.updateChannelInfo(
       currentUser.userId,
@@ -389,36 +402,63 @@ const connectTwitch = async (serverAndClient, twitchClientId, twitchAccessToken,
       }
     )
   })
-  serverAndClient.addMethod('channelUpdateLanguage', ({language}) => twitchApiInstance?.channels.updateChannelInfo(currentUser.userId, { language }))
-  serverAndClient.addMethod('channelStartCommercial', ({duration}) => twitchApiInstance?.channels.startChannelCommercial(currentUser.userId, duration))
+  serverAndClient.addMethod('channelUpdateLanguage', ({ language }) => twitchApiInstance?.channels.updateChannelInfo(currentUser.userId, { language }))
+  serverAndClient.addMethod('channelStartCommercial', ({ duration }) => twitchApiInstance?.channels.startChannelCommercial(currentUser.userId, duration))
 
   // ChannelPointsApi
-  serverAndClient.addMethod('channelPointsGetCustomRewards', ({onlyManageable}) => twitchApiInstance?.channelPoints.getCustomRewards(currentUser.userId, onlyManageable))
-  serverAndClient.addMethod('channelPointsGetCustomRewardsByIds', ({rewardIds}) => twitchApiInstance?.channelPoints.getCustomRewardsByIds(currentUser.userId, rewardIds))
-  serverAndClient.addMethod('channelPointsGetCustomRewardById', ({rewardId}) => twitchApiInstance?.channelPoints.getCustomRewardById(currentUser.userId, rewardId))
-  serverAndClient.addMethod('channelPointsCreateCustomReward', ({rewardData}) => twitchApiInstance?.channelPoints.createCustomReward(currentUser.userId, rewardData))
-  serverAndClient.addMethod('channelPointsUpdateCustomReward', ({rewardId, rewardData}) => twitchApiInstance?.channelPoints.updateCustomReward(currentUser.userId, rewardId, rewardData))
-  serverAndClient.addMethod('channelPointsDeleteCustomReward', ({rewardId}) => twitchApiInstance?.channelPoints.deleteCustomReward(currentUser.userId, rewardId))
-  serverAndClient.addMethod('channelPointsGetRedemptionsByIds', ({rewardId, redemptionIds}) => twitchApiInstance?.channelPoints.getRedemptionsByIds(currentUser.userId, rewardId, redemptionIds))
-  serverAndClient.addMethod('channelPointsGetRedemptionById', ({rewardId, redemptionIds}) => twitchApiInstance?.channelPoints.getRedemptionById(currentUser.userId, rewardId, redemptionIds))
-  serverAndClient.addMethod('channelPointsGetRedemptionsForBroadcaster', ({rewardId, status, filter}) => twitchApiInstance?.channelPoints.getRedemptionsForBroadcaster(currentUser.userId, rewardId, status, filter))
-  serverAndClient.addMethod('channelPointsGetRedemptionsForBroadcasterPaginated', ({rewardId, status, filter}) => twitchApiInstance?.channelPoints.getRedemptionsForBroadcasterPaginated(currentUser.userId, rewardId, status, filter))
-  serverAndClient.addMethod('channelPointsUpdateRedemptionStatusByIds', ({rewardId, redemptionIds, status}) => twitchApiInstance?.channelPoints.updateRedemptionStatusByIds(currentUser.userId, rewardId, redemptionIds, status))
+  serverAndClient.addMethod('channelPointsGetCustomRewards', ({ onlyManageable }) => twitchApiInstance?.channelPoints.getCustomRewards(currentUser.userId, onlyManageable))
+  serverAndClient.addMethod('channelPointsGetCustomRewardsByIds', ({ rewardIds }) => twitchApiInstance?.channelPoints.getCustomRewardsByIds(currentUser.userId, rewardIds))
+  serverAndClient.addMethod('channelPointsGetCustomRewardById', ({ rewardId }) => twitchApiInstance?.channelPoints.getCustomRewardById(currentUser.userId, rewardId))
+  serverAndClient.addMethod('channelPointsCreateCustomReward', ({ rewardData }) => twitchApiInstance?.channelPoints.createCustomReward(currentUser.userId, rewardData))
+  serverAndClient.addMethod('channelPointsUpdateCustomReward', ({
+    rewardId,
+    rewardData
+  }) => twitchApiInstance?.channelPoints.updateCustomReward(currentUser.userId, rewardId, rewardData))
+  serverAndClient.addMethod('channelPointsDeleteCustomReward', ({ rewardId }) => twitchApiInstance?.channelPoints.deleteCustomReward(currentUser.userId, rewardId))
+  serverAndClient.addMethod('channelPointsGetRedemptionsByIds', ({
+    rewardId,
+    redemptionIds
+  }) => twitchApiInstance?.channelPoints.getRedemptionsByIds(currentUser.userId, rewardId, redemptionIds))
+  serverAndClient.addMethod('channelPointsGetRedemptionById', ({
+    rewardId,
+    redemptionIds
+  }) => twitchApiInstance?.channelPoints.getRedemptionById(currentUser.userId, rewardId, redemptionIds))
+  serverAndClient.addMethod('channelPointsGetRedemptionsForBroadcaster', ({
+    rewardId,
+    status,
+    filter
+  }) => twitchApiInstance?.channelPoints.getRedemptionsForBroadcaster(currentUser.userId, rewardId, status, filter))
+  serverAndClient.addMethod('channelPointsGetRedemptionsForBroadcasterPaginated', ({
+    rewardId,
+    status,
+    filter
+  }) => twitchApiInstance?.channelPoints.getRedemptionsForBroadcasterPaginated(currentUser.userId, rewardId, status, filter))
+  serverAndClient.addMethod('channelPointsUpdateRedemptionStatusByIds', ({
+    rewardId,
+    redemptionIds,
+    status
+  }) => twitchApiInstance?.channelPoints.updateRedemptionStatusByIds(currentUser.userId, rewardId, redemptionIds, status))
 
   // CLip
-  serverAndClient.addMethod('clipGetClipsForBroadcaster', ({filter}) => twitchApiInstance?.clips.getClipsForBroadcaster(currentUser.userId, filter))
-  serverAndClient.addMethod('getClipsForBroadcasterPaginated', ({filter}) => twitchApiInstance?.clips.getClipsForBroadcasterPaginated(currentUser.userId, filter))
-  serverAndClient.addMethod('getClipsForGame', ({gameId, filter}) => twitchApiInstance?.clips.getClipsForGame(gameId, filter))
-  serverAndClient.addMethod('getClipsForGamePaginated', ({gameId, filter}) => twitchApiInstance?.clips.getClipsForGamePaginated(gameId, filter))
-  serverAndClient.addMethod('getClipsByIds', ({ids}) => twitchApiInstance?.clips.getClipsByIds(ids))
-  serverAndClient.addMethod('getClipById', ({id}) => twitchApiInstance?.clips.getClipById(id))
-  serverAndClient.addMethod('createClip', ({createAfterDelay}) => twitchApiInstance?.clips.createClip({
+  serverAndClient.addMethod('clipGetClipsForBroadcaster', ({ filter }) => twitchApiInstance?.clips.getClipsForBroadcaster(currentUser.userId, filter))
+  serverAndClient.addMethod('getClipsForBroadcasterPaginated', ({ filter }) => twitchApiInstance?.clips.getClipsForBroadcasterPaginated(currentUser.userId, filter))
+  serverAndClient.addMethod('getClipsForGame', ({
+    gameId,
+    filter
+  }) => twitchApiInstance?.clips.getClipsForGame(gameId, filter))
+  serverAndClient.addMethod('getClipsForGamePaginated', ({
+    gameId,
+    filter
+  }) => twitchApiInstance?.clips.getClipsForGamePaginated(gameId, filter))
+  serverAndClient.addMethod('getClipsByIds', ({ ids }) => twitchApiInstance?.clips.getClipsByIds(ids))
+  serverAndClient.addMethod('getClipById', ({ id }) => twitchApiInstance?.clips.getClipById(id))
+  serverAndClient.addMethod('createClip', ({ createAfterDelay }) => twitchApiInstance?.clips.createClip({
     channelId: currentUser.userId,
     createAfterDelay
   }))
 
   // Users
-  serverAndClient.addMethod('usersGetUserByName', async ({user}) => {
+  serverAndClient.addMethod('usersGetUserByName', async ({ user }) => {
     const data = await twitchApiInstance.users.getUserByName(user)
     return {
       broadcasterType: data.broadcasterType,
@@ -437,7 +477,41 @@ const connectTwitch = async (serverAndClient, twitchClientId, twitchAccessToken,
   await twitchChatInstance.connect()
 }
 
-function onstart() {
+const main = async () => {
+  const questions = []
+
+  if (!EVNTBOARD_HOST) {
+    questions.push({
+      type: 'text',
+      name: 'host',
+      message: 'What is the EvntBoard host ?'
+    })
+  }
+
+  if (!MODULE_NAME) {
+    questions.push({
+      type: 'text',
+      name: 'name',
+      message: 'What is your module name ?'
+    })
+  }
+
+  if (!MODULE_TOKEN) {
+    questions.push({
+      type: 'text',
+      name: 'token',
+      message: 'What is your module token?'
+    })
+  }
+
+  let { token, name, host } = await prompts(questions)
+
+  const config = {
+    host: host ?? EVNTBOARD_HOST,
+    name: name ?? MODULE_NAME,
+    token: token ?? MODULE_TOKEN,
+  }
+
   let ws
 
   const serverAndClient = new JSONRPCServerAndClient(
@@ -452,13 +526,13 @@ function onstart() {
     }, () => uuid())
   )
 
-  const wsUri = START_ARGS['host'] ?? 'ws://localhost:8080/module'
-  ws = new WebSocket(wsUri)
+  ws = new WebSocket(config.host)
 
   ws.onopen = async () => {
     const result = await serverAndClient.request('session.register', {
       code: MODULE_CODE,
-      name: MODULE_NAME
+      name: config.name,
+      token: config.token
     })
 
     let twitchClientId = result?.find((c) => c.key === 'clientId')?.value ?? undefined
@@ -487,4 +561,7 @@ function onstart() {
   }
 }
 
-onstart()
+main()
+  .catch((e) => {
+    console.error(e)
+  })

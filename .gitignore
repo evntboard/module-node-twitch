@@ -170,3 +170,7 @@ dist
 
 # IntelliJ based IDEs
 .idea
+
+build
+node_modules
+pkg-cache

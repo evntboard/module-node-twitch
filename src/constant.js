@@ -1,11 +1,10 @@
-import yargs from 'yargs-parser'
+import process from 'node:process'
 
 export const MODULE_CODE = 'twitch'
 
-const rawArgs = process.argv.slice(1);
-export const START_ARGS = yargs(rawArgs);
-
-export const MODULE_NAME = START_ARGS["name"] ?? 'twitch'
+export const MODULE_NAME= process.env["MODULE_NAME"]
+export const MODULE_TOKEN = process.env["MODULE_TOKEN"]
+export const EVNTBOARD_HOST = process.env["EVNTBOARD_HOST"]
 
 export const TWITCH_SCOPES = [
   'analytics:read:extensions',
