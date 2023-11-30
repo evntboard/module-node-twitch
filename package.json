@@ -4,8 +4,8 @@
   "description": "Module twitch for Evntboard",
   "author": "EvntBoard.io",
   "license": "MIT",
-  "module": "src/main.ts",
-  "bin": "src/main.ts",
+  "module": "dist/main.js",
+  "bin": "dist/main.js",
   "scripts": {
     "dev": "nodemon --watch \"src/**/*.ts\" --exec \"ts-node\" src/main.ts",
     "start": "ts-node src/main.ts",
@@ -21,7 +21,6 @@
     "@twurple/eventsub-ws": "^7.0.5",
     "dotenv": "^16.3.1",
     "json-rpc-2.0": "^1.6.0",
-    "prompts": "^2.4.2",
     "uuid": "^9.0.1"
   },
   "devDependencies": {

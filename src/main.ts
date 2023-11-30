@@ -1,5 +1,4 @@
 import 'dotenv/config'
-import * as prompts from 'prompts'
 import {JSONRPCClient, JSONRPCServer, JSONRPCServerAndClient} from 'json-rpc-2.0'
 import {v4 as uuid} from 'uuid'
 import {WebSocket} from 'ws'
@@ -15,39 +14,17 @@ import {twitchApiRegister} from './twitch/twitchApi'
 import {EVNTBOARD_HOST, MODULE_CODE, MODULE_NAME, MODULE_TOKEN, TWITCH_SCOPES} from './constant'
 
 const main = async () => {
-  const questions: prompts.PromptObject[] = []
 
   if (!EVNTBOARD_HOST) {
-    questions.push({
-      type: 'text',
-      name: 'host',
-      message: 'What is the EvntBoard host ?'
-    })
+    throw new Error("EVNTBOARD_HOST not set")
   }
 
   if (!MODULE_NAME) {
-    questions.push({
-      type: 'text',
-      name: 'name',
-      message: 'What is your module name ?'
-    })
+    throw new Error("MODULE_NAME not set")
   }
 
   if (!MODULE_TOKEN) {
-    questions.push({
-      type: 'text',
-      name: 'token',
-      message: 'What is your module token?'
-    })
-  }
-
-  // @ts-ignore
-  let {token, name, host} = await prompts.default(questions)
-
-  const config = {
-    host: host ?? EVNTBOARD_HOST,
-    name: name ?? MODULE_NAME,
-    token: token ?? MODULE_TOKEN,
+    throw new Error("MODULE_TOKEN not set")
   }
 
   let ws: WebSocket
@@ -64,13 +41,13 @@ const main = async () => {
     }, () => uuid())
   )
 
-  ws = new WebSocket(config.host)
+  ws = new WebSocket(EVNTBOARD_HOST)
 
   ws.onopen = async () => {
     const result = await serverAndClient.request('session.register', {
       code: MODULE_CODE,
-      name: config.name,
-      token: config.token
+      name: MODULE_NAME,
+      token: MODULE_TOKEN
     })
 
     let twitchClientId = result?.find((c: { key: string, value: string }) => c.key === 'clientId')?.value ?? undefined
