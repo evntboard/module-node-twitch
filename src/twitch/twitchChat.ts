@@ -19,6 +19,7 @@ import {
   transformChatSubInfo,
   transformChatSubUpgradeInfo,
   transformClearChat,
+  transformClearMsg,
   transformUserNotice,
   transformWhisper
 } from '../transform'
@@ -26,15 +27,65 @@ import {
 export async function twitchChatListen(twitchChatInstance: ChatClient, currentUser: TokenInfo, serverAndClient: JSONRPCServerAndClient) {
   twitchChatInstance.onConnect(() => {
     serverAndClient.notify('event.new', {
-      name: `${MODULE_CODE}-connected`
+      name: `${MODULE_CODE}-connect`
+    })
+  })
+
+  twitchChatInstance.onDisconnect(() => {
+    serverAndClient.notify('event.new', {
+      name: `${MODULE_CODE}-disconnect`
+    })
+  })
+
+  twitchChatInstance.onNoPermission((channel, text) => {
+    serverAndClient.notify('event.new', {
+      name: `${MODULE_CODE}-no-permission`,
+      payload: {
+        text
+      }
     })
   })
 
   // Fires when a user sends a message to a channel.
-  twitchChatInstance?.onMessage((channel, _, message, msg) => {
+  twitchChatInstance?.onMessage((channel, user, text, msg) => {
     serverAndClient.notify('event.new', {
       name: `${MODULE_CODE}-message`,
-      payload: transformChatMessage(message, msg),
+      payload: transformChatMessage(text, msg),
+    })
+  })
+
+  twitchChatInstance?.onMessageRemove((channel, messageId, msg) => {
+    serverAndClient.notify('event.new', {
+      name: `${MODULE_CODE}-message-remove`,
+      payload: transformClearMsg(msg),
+    })
+  })
+
+  twitchChatInstance?.onMessageRatelimit((channel, text) => {
+    serverAndClient.notify('event.new', {
+      name: `${MODULE_CODE}-message-ratelimit`,
+      payload: {
+        text
+      },
+    })
+  })
+
+  twitchChatInstance?.onUniqueChat((channel, enabled) => {
+    serverAndClient.notify('event.new', {
+      name: `${MODULE_CODE}-unique-chat`,
+      payload: {
+        enabled
+      },
+    })
+  })
+
+  twitchChatInstance?.onAnnouncement((channel, user, announcementInfo, msg) => {
+    serverAndClient.notify('event.new', {
+      name: `${MODULE_CODE}-announcement`,
+      payload: {
+        color: announcementInfo.color,
+        ...transformUserNotice(msg),
+      },
     })
   })
 
@@ -133,6 +184,15 @@ export async function twitchChatListen(twitchChatInstance: ChatClient, currentUs
   twitchChatInstance?.onJoin((channel, user) => {
     serverAndClient.notify('event.new', {
       name: `${MODULE_CODE}-join`,
+      payload: {user},
+
+    })
+  })
+
+  // Fires when a user  fail joins a channel.
+  twitchChatInstance?.onJoinFailure((channel, user) => {
+    serverAndClient.notify('event.new', {
+      name: `${MODULE_CODE}-join-failure`,
       payload: {user},
 
     })
@@ -318,6 +378,9 @@ export async function twitchChatRegister(twitchChatInstance: ChatClient, current
     throw new Error('Token have no userName set !')
   }
 
-  serverAndClient.addMethod('say', ({message, reply}) => twitchChatInstance?.say(currentUser.userName as string, message, {replyTo: reply}))
+  serverAndClient.addMethod('say', ({
+                                      message,
+                                      reply
+                                    }) => twitchChatInstance?.say(currentUser.userName as string, message, {replyTo: reply}))
   serverAndClient.addMethod('me', ({message}) => twitchChatInstance?.action(currentUser.userName as string, message))
 }
