@@ -1,4 +1,4 @@
-export const transformChatMessage = (message, data) => ({
+export const transformChatMessage = (message: any, data: any) => ({
   message,
   id: data?.id,
   date: data?.date,
@@ -35,7 +35,7 @@ export const transformChatMessage = (message, data) => ({
   }
 })
 
-export const transformChatUser = (data) => ({
+export const transformChatUser = (data: any): any => ({
   userName: data?.userName,
   displayName: data?.displayName,
   color: data?.color,
@@ -51,7 +51,7 @@ export const transformChatUser = (data) => ({
   isArtist: data?.isArtist,
 })
 
-export const transformPubSubBitsMessage = (data) => ({
+export const transformPubSubBitsMessage = (data: any): any => ({
   userId: data?.userId,
   userName: data?.userName,
   message: data?.message,
@@ -60,7 +60,7 @@ export const transformPubSubBitsMessage = (data) => ({
   isAnonymous: data?.isAnonymous,
 })
 
-export const transformPubSubRedemptionMessage = (data) => ({
+export const transformPubSubRedemptionMessage = (data: any): any => ({
   id: data?.id,
   userId: data?.userId,
   userName: data?.userName,
@@ -86,19 +86,19 @@ export const transformPubSubRedemptionMessage = (data) => ({
   status: data?.status,
 })
 
-export const transformClearChat = (user, data) => ({
+export const transformClearChat = (user: any, data: any): any => ({
   user,
   date: data?.date,
   channelId: data?.channelId,
   targetUserId: data?.targetUserId,
 })
 
-export const transformChatBitsBadgeUpgradeInfo = (data) => ({
+export const transformChatBitsBadgeUpgradeInfo = (data: any): any => ({
   displayName: data?.displayName,
   threshold: data?.threshold,
 })
 
-export const transformUserNotice = (data) => ({
+export const transformUserNotice = (data: any): any => ({
   id: data?.id,
   date: data?.date,
   userInfo: transformChatUser(data?.userInfo),
@@ -106,14 +106,14 @@ export const transformUserNotice = (data) => ({
   emoteOffsets: Object.fromEntries(data?.emoteOffsets),
 })
 
-export const transformChatCommunityPayForwardInfo = (data) => ({
+export const transformChatCommunityPayForwardInfo = (data: any): any => ({
   userId: data?.userId,
   displayName: data?.displayName,
   originalGifterUserId: data?.originalGifterUserId,
   originalGifterDisplayName: data?.originalGifterDisplayName,
 })
 
-export const transformChatCommunitySubInfo = (data) => ({
+export const transformChatCommunitySubInfo = (data: any): any => ({
   gifter: data?.gifter,
   gifterUserId: data?.gifterUserId,
   gifterDisplayName: data?.gifterDisplayName,
@@ -122,31 +122,31 @@ export const transformChatCommunitySubInfo = (data) => ({
   plan: data?.plan,
 })
 
-export const transformChatSubGiftUpgradeInfo = (data) => ({
+export const transformChatSubGiftUpgradeInfo = (data: any): any => ({
   userId: data?.userId,
   displayName: data?.displayName,
   gifter: data?.gifter,
   gifterDisplayName: data?.gifterDisplayName,
 })
 
-export const transformChatPrimeCommunityGiftInfo = (data) => ({
+export const transformChatPrimeCommunityGiftInfo = (data: any): any => ({
   name: data?.name,
   gifter: data?.gifter,
   gifterDisplayName: data?.gifterDisplayName,
 })
 
-export const transformChatSubUpgradeInfo = (data) => ({
+export const transformChatSubUpgradeInfo = (data: any): any => ({
   userId: data?.userId,
   displayName: data?.displayName,
   plan: data?.plan,
 })
 
-export const transformChatRaidInfo = (data) => ({
+export const transformChatRaidInfo = (data: any): any => ({
   displayName: data?.displayName,
   viewerCount: data?.viewerCount,
 })
 
-export const transformChatSubInfo = (data) => ({
+export const transformChatSubInfo = (data: any): any => ({
   userId: data?.userId,
   displayName: data?.displayName,
   plan: data?.plan,
@@ -158,7 +158,7 @@ export const transformChatSubInfo = (data) => ({
   originalGiftInfo: transformChatSubOriginalGiftInfo(data?.originalGiftInfo),
 })
 
-export const transformChatSubOriginalGiftInfo = (data) => ({
+export const transformChatSubOriginalGiftInfo = (data: any): any => ({
   anonymous: data?.anonymous,
   userId: data?.userId,
   userName: data?.userName,
@@ -167,7 +167,7 @@ export const transformChatSubOriginalGiftInfo = (data) => ({
   redeemedMonth: data?.redeemedMonth,
 })
 
-export const transformChatRewardGiftInfo = (data) => ({
+export const transformChatRewardGiftInfo = (data: any): any => ({
   domain: data?.domain,
   count: data?.count,
   gifterId: data?.gifterId,
@@ -176,12 +176,12 @@ export const transformChatRewardGiftInfo = (data) => ({
   triggerType: data?.triggerType,
 })
 
-export const transformChatRitualInfo = (data) => ({
+export const transformChatRitualInfo = (data: any): any => ({
   ritualName: data?.ritualName,
   message: data?.message,
 })
 
-export const transformChatStandardPayForwardInfo = (data) => ({
+export const transformChatStandardPayForwardInfo = (data: any): any => ({
   userId: data?.userId,
   displayName: data?.displayName,
   recipientUserId: data?.recipientUserId,
@@ -190,7 +190,7 @@ export const transformChatStandardPayForwardInfo = (data) => ({
   originalGifterDisplayName: data?.originalGifterDisplayName,
 })
 
-export const transformChatSubExtendInfo = (data) => ({
+export const transformChatSubExtendInfo = (data: any): any => ({
   userId: data?.userId,
   displayName: data?.displayName,
   plan: data?.plan,
@@ -198,7 +198,7 @@ export const transformChatSubExtendInfo = (data) => ({
   endMonth: data?.endMonth
 })
 
-export const transformChatSubGiftInfo = (data) => ({
+export const transformChatSubGiftInfo = (data: any): any => ({
   ...transformChatSubInfo(data),
   gifter: data?.gifter,
   gifterUserId: data?.gifterUserId,
@@ -207,9 +207,16 @@ export const transformChatSubGiftInfo = (data) => ({
   giftDuration: data?.giftDuration
 })
 
-export const transformWhisper = (data) => ({
+export const transformWhisper = (data: any): any => ({
   userInfo: transformChatUser(data?.userInfo),
   target: data?.target,
   text: data?.text,
   emoteOffsets: Object.fromEntries(data?.gifterGiftCount),
+})
+
+export const transformClearMsg = (data: any): any => ({
+  date: data?.date?.toISOString(),
+  userName: data?.userName,
+  channelId: data?.channelId,
+  targetMessageId: data?.targetMessageId,
 })
