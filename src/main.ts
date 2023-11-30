@@ -94,6 +94,8 @@ const main = async () => {
 
     twitchEventSubInstance.start()
 
+    twitchChatInstance.connect()
+
     await twitchChatListen(twitchChatInstance, currentUser, serverAndClient)
 
     await twitchEventSubListen(twitchEventSubInstance, currentUser, serverAndClient)
@@ -102,7 +104,6 @@ const main = async () => {
 
     await twitchApiRegister(twitchApiInstance, currentUser, serverAndClient)
 
-    await twitchChatInstance.connect()
   }
 
   ws.onmessage = (event) => {
